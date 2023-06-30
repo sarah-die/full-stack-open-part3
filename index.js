@@ -3,7 +3,17 @@ const app = express();
 const morgan = require("morgan");
 
 app.use(express.json());
-app.use(morgan("tiny"));
+
+morgan.token("body", (req) => {
+  if (req.method === "POST") {
+    return JSON.stringify(req.body);
+  }
+  return " ";
+});
+
+app.use(
+  morgan(":method :url :status :res[content-length] - :response-time ms :body")
+);
 
 let persons = [
   {
@@ -70,7 +80,7 @@ app.delete("/api/persons/:id", (req, res) => {
 const generateRandomId = () => {
   let newId = 0;
   while (newId === 0) {
-    newId = Math.floor(Math.random()*1000)
+    newId = Math.floor(Math.random() * 1000);
     if (persons.find((p) => p.id === newId)) {
       newId = 0;
     }
