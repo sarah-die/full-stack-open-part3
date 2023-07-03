@@ -6,6 +6,9 @@ const cors = require("cors");
 app.use(express.json());
 app.use(cors());
 
+// imp! middleware that checks if there is a build file whenever express gets an HTTP GET to www.myurl.com/index.html or www.myurl.com
+app.use(express.static("build"));
+
 morgan.token("body", (req) => {
   if (req.method === "POST") {
     return JSON.stringify(req.body);
@@ -120,7 +123,7 @@ app.post("/api/persons", (request, response) => {
   response.json(person);
 });
 
-const PORT = 3001;
+const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
