@@ -20,6 +20,8 @@ morgan.token("body", (req) => {
   return " ";
 });
 
+let persons = [];
+
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
@@ -79,45 +81,59 @@ app.delete("/api/persons/:id", (req, res) => {
 });
 
 // 3.5 + 3.6: Phonebook backend, step 5 + step 6
-const generateRandomId = () => {
-  let newId = 0;
-  while (newId === 0) {
-    newId = Math.floor(Math.random() * 1000);
-    if (persons.find((p) => p.id === newId)) {
-      newId = 0;
-    }
-  }
-  return newId;
-};
+// const generateRandomId = () => {
+//   let newId = 0;
+//   while (newId === 0) {
+//     newId = Math.floor(Math.random() * 1000);
+//     if (persons.find((p) => p.id === newId)) {
+//       newId = 0;
+//     }
+//   }
+//   return newId;
+// };
+// // app.post("/api/persons", (request, response) => {
+//   const body = request.body;
+//
+//   if (!body.name) {
+//     return response.status(400).json({
+//       error: "content -name- missing",
+//     });
+//   }
+//   if (!body.number) {
+//     return response.status(400).json({
+//       error: "content -number- missing",
+//     });
+//   }
+//   if (persons.find((person) => person.name === body.name)) {
+//     return response.status(400).json({
+//       error: "name must be unique",
+//     });
+//   }
+//
+//   const person = {
+//     id: generateRandomId(),
+//     name: body.name,
+//     number: body.number,
+//   };
+//
+//   persons = persons.concat(person);
+//
+//   response.json(person);
+// });
 
+// 3.13 Phonebook database, step 1
 app.post("/api/persons", (request, response) => {
   const body = request.body;
-
-  if (!body.name) {
-    return response.status(400).json({
-      error: "content -name- missing",
-    });
+  if (body.name === undefined || body.number === undefined) {
+    return response.status(400).json({ error: "please provide name and number" });
   }
-  if (!body.number) {
-    return response.status(400).json({
-      error: "content -number- missing",
-    });
-  }
-  if (persons.find((person) => person.name === body.name)) {
-    return response.status(400).json({
-      error: "name must be unique",
-    });
-  }
-
-  const person = {
-    id: generateRandomId(),
+  const person = new Person({
     name: body.name,
     number: body.number,
-  };
-
-  persons = persons.concat(person);
-
-  response.json(person);
+  });
+  person.save().then((savedPerson) => {
+    response.json(savedPerson);
+  });
 });
 
 const PORT = process.env.PORT;
