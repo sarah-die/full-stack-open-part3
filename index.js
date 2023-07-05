@@ -154,7 +154,7 @@ app.delete("/api/persons/:id", (request, response, next) => {
 // 3.13 Phonebook database, step 1
 app.post("/api/persons", (request, response, next) => {
   const body = request.body;
-  if (body.name === "" || body.number === "") {
+  if (body.name === undefined || body.number === undefined) {
     return response
       .status(400)
       .json({ error: "please provide name and number" });
