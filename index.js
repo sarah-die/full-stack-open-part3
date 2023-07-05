@@ -53,7 +53,7 @@ app.get("/api/persons/", (request, response) => {
   });
 });
 
-// 3.2: Phonebook backend, step 2 / 3.13 Phonebook database, step 1
+// 3.2: Phonebook backend, step 2 / 3.18*: Phonebook database, step 6
 app.get("/info", (req, res) => {
   Person.find({}).then((persons) => {
     res.send(
