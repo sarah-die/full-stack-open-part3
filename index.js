@@ -20,8 +20,6 @@ morgan.token("body", (req) => {
   return " ";
 });
 
-let persons = [];
-
 app.use(
   morgan(":method :url :status :res[content-length] - :response-time ms :body")
 );
@@ -73,11 +71,20 @@ app.get("/api/persons/:id", (request, response) => {
 });
 
 // 3.4: Phonebook backend, step 4
-app.delete("/api/persons/:id", (req, res) => {
-  const id = Number(req.params.id);
-  persons = persons.filter((person) => person.id !== id);
+// app.delete("/api/persons/:id", (req, res) => {
+//   const id = Number(req.params.id);
+//   persons = persons.filter((person) => person.id !== id);
+//
+//   res.status(204).end();
+// });
 
-  res.status(204).end();
+// 3.15: Phonebook database, step 3
+app.delete("/api/persons/:id", (request, response, next) => {
+  Person.findByIdAndRemove(request.params.id)
+    .then((result) => {
+      response.status(204).end;
+    })
+    .catch((error) => next(error));
 });
 
 // 3.5 + 3.6: Phonebook backend, step 5 + step 6
@@ -125,7 +132,9 @@ app.delete("/api/persons/:id", (req, res) => {
 app.post("/api/persons", (request, response) => {
   const body = request.body;
   if (body.name === undefined || body.number === undefined) {
-    return response.status(400).json({ error: "please provide name and number" });
+    return response
+      .status(400)
+      .json({ error: "please provide name and number" });
   }
   const person = new Person({
     name: body.name,
